@@ -1,0 +1,4 @@
+tesseract-ocr
+poppler-utils
+libjpeg-dev
+zlib1g-dev
