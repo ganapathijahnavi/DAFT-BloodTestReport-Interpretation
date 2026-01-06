@@ -1,0 +1,27 @@
+# fastapi
+# uvicorn
+# transformers
+# torch
+# pytesseract
+# pdfplumber
+# pdf2image
+# pillow
+# python-docx
+# python-multipart
+
+
+fastapi
+uvicorn
+python-multipart
+pdfplumber
+pytesseract
+pillow
+pdf2image
+python-docx
+pymongo
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic[email]
+python-dotenv
+email-validator
+dnspython

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+.env.*
+!.env.example
+
+# Backend uploads/temp
+backend/uploads/
+backend/temp_uploads/
+uploads/
+temp_uploads/
+
+# Node/React
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# OS/editor noise
+*.DS_Store
+Thumbs.db
