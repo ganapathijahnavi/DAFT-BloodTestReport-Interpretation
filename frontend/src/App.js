@@ -313,7 +313,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-const API_URL = "http://127.0.0.1:8000";
+// Deployed backend base URL (Hugging Face Space)
+const API_URL = "https://ganapati-jahnavi-daft-bloodtest-interpretation.hf.space";
 
 const App = () => {
   // Auth state
