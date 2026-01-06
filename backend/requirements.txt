@@ -25,3 +25,6 @@ pydantic[email]
 python-dotenv
 email-validator
 dnspython
+torch
+transformers
+
