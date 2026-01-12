@@ -1,19 +1,50 @@
 # model.py
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 
-MODEL_NAME = "ganapati-jahnavi/tinylamma-medical-bloodtest"
+# -------------------------------
+# MODEL CONFIG
+# -------------------------------
+BASE_MODEL = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+ADAPTER_MODEL = "ganapati-jahnavi/tinylamma-medical-bloodtest"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+DEVICE = "cpu"  # HF Spaces CPU safe
+DTYPE = torch.float32
 
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_NAME,
-    dtype=torch.float32,
-    device_map=None  # CPU safe
+
+# -------------------------------
+# LOAD TOKENIZER
+# -------------------------------
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+
+# -------------------------------
+# LOAD BASE MODEL
+# -------------------------------
+base_model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL,
+    torch_dtype=DTYPE,
+    device_map=None
 )
+
+# -------------------------------
+# LOAD YOUR FINE-TUNED LoRA ADAPTER
+# -------------------------------
+model = PeftModel.from_pretrained(
+    base_model,
+    ADAPTER_MODEL
+)
+
+model.to(DEVICE)
 model.eval()
 
 
+# ======================================================
+# MAIN MEDICAL INTERPRETATION FUNCTION
+# ======================================================
 def run_medical_model(context_text: str) -> str:
     prompt = f"""
 You are a medical AI assistant.
@@ -40,13 +71,13 @@ Medical Interpretation:
         return_tensors="pt",
         truncation=True,
         max_length=1024
-    )
+    ).to(DEVICE)
 
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
             max_new_tokens=350,
-            min_new_tokens=120,   # 🔥 VERY IMPORTANT
+            min_new_tokens=120,
             temperature=0.4,
             do_sample=True,
             top_p=0.9,
@@ -56,11 +87,11 @@ Medical Interpretation:
 
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # 🔹 Remove prompt safely
+    # Remove prompt safely
     if "Medical Interpretation:" in decoded:
         decoded = decoded.split("Medical Interpretation:")[-1].strip()
 
-    # 🔹 Guard against empty / echoed output
+    # Guard against empty / echoed output
     if len(decoded.strip()) < 30:
         decoded = (
             "- The reported abnormalities suggest physiological imbalance.\n"
@@ -68,7 +99,7 @@ Medical Interpretation:
             "- Follow-up testing and physician consultation are advised."
         )
 
-    # 🔹 Append disclaimer once
+    # Append disclaimer once
     decoded += (
         "\n\n⚠️ Disclaimer: This is an AI-generated educational summary. "
         "It is not a medical diagnosis. Please consult a qualified physician."
@@ -77,10 +108,10 @@ Medical Interpretation:
     return decoded
 
 
+# ======================================================
+# CHAT ABOUT REPORT FUNCTION
+# ======================================================
 def chat_about_report(report_context: str, user_question: str) -> str:
-    """
-    Answer user questions about a specific medical report
-    """
     prompt = f"""
 You are a medical AI assistant helping a patient understand their blood test report.
 
@@ -103,7 +134,7 @@ Answer:
         return_tensors="pt",
         truncation=True,
         max_length=1024
-    )
+    ).to(DEVICE)
 
     with torch.no_grad():
         outputs = model.generate(
@@ -119,12 +150,13 @@ Answer:
 
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # Remove prompt
     if "Answer:" in decoded:
         decoded = decoded.split("Answer:")[-1].strip()
 
-    # Guard against empty response
     if len(decoded.strip()) < 20:
-        decoded = "I'm unable to provide a specific answer based on the report data. Please consult with your healthcare provider for detailed medical advice."
+        decoded = (
+            "I'm unable to provide a specific answer based on the report data. "
+            "Please consult with your healthcare provider for detailed medical advice."
+        )
 
     return decoded
