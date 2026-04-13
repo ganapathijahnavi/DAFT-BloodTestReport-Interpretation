@@ -1531,6 +1531,7 @@
 
 // ✅ ONLY UI ENHANCEMENT ADDED — NOTHING ELSE MODIFIED
 
+
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -1538,6 +1539,7 @@ const API_URL = "https://ganapati-jahnavi-daft-bloodtest-interpretation.hf.space
 
 const App = () => {
 
+  // ✅ FIXED FORMATTER
   const formatMedicalOutput = (text) => {
     const sections = [];
     const lines = text.split("\n");
@@ -1548,18 +1550,23 @@ const App = () => {
       line = line.trim();
       if (!line) return;
 
-      if (line.endsWith(":") && !line.startsWith("-")) {
+      // 🔥 remove "-" only for logic
+      const cleanLine = line.replace(/^-\s*/, "");
+
+      // 🔥 detect headings correctly
+      if (cleanLine.endsWith(":")) {
         if (current) sections.push(current);
 
         current = {
-          title: line.replace(":", ""),
+          title: cleanLine.replace(":", ""),
           points: [],
         };
       } else {
         if (!current) {
           current = { title: "Summary", points: [] };
         }
-        current.points.push(line.replace(/^-\s*/, ""));
+
+        current.points.push(cleanLine);
       }
     });
 
@@ -1727,7 +1734,8 @@ const App = () => {
                   {formatMedicalOutput(m.text).map((sec, idx) => (
                     <div key={idx} style={styles.reportSection}>
                       
-                      <div style={styles.reportHeader}>
+                      {/* ✅ BOLD HEADINGS */}
+                      <div style={{ ...styles.reportHeader, fontWeight: "700" }}>
                         {sec.title}
                       </div>
 
@@ -1799,7 +1807,6 @@ const App = () => {
   );
 };
 
-/* STYLES */
 const styles = {
   page: { height: "100vh", display: "flex", fontFamily: "Inter" },
   sidebar: { width: 260, padding: 16 },
