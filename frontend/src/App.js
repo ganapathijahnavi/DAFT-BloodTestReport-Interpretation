@@ -1538,7 +1538,6 @@ const API_URL = "https://ganapati-jahnavi-daft-bloodtest-interpretation.hf.space
 
 const App = () => {
 
-  // 🔥 NEW FORMATTER FUNCTION (ADDED)
   const formatMedicalOutput = (text) => {
     const sections = [];
     const lines = text.split("\n");
@@ -1569,7 +1568,6 @@ const App = () => {
     return sections;
   };
 
-  // 🔥 YOUR ORIGINAL STATES (UNCHANGED)
   const [sessions, setSessions] = useState([]);
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -1585,7 +1583,6 @@ const App = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeSession?.messages, loading]);
 
-  /* ---------- SESSION ---------- */
   const createNewSession = () => {
     const id = uuidv4();
     setSessions(prev => [
@@ -1596,7 +1593,6 @@ const App = () => {
     setSelectedFile(null);
   };
 
-  /* ---------- FILE SELECT ---------- */
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -1620,7 +1616,6 @@ const App = () => {
     );
   };
 
-  /* ---------- SEND ---------- */
   const handleSend = async () => {
     if (!selectedFile || !activeSessionId) return;
 
@@ -1684,7 +1679,6 @@ const App = () => {
   return (
     <div style={{ ...styles.page, background: theme.page }}>
 
-      {/* SIDEBAR */}
       <div style={{ ...styles.sidebar, background: theme.sidebar }}>
         <h2 style={{ color: theme.text }}>🧠 Medical AI</h2>
 
@@ -1710,7 +1704,6 @@ const App = () => {
         ))}
       </div>
 
-      {/* CHAT */}
       <div style={{ ...styles.chat, background: theme.chat }}>
         <div style={styles.messages}>
 
@@ -1729,20 +1722,23 @@ const App = () => {
             >
               {m.title && <strong>{m.title}</strong>}
 
-              {/* 🔥 PREMIUM UI HERE */}
               {m.sender === "bot" ? (
-                <div style={styles.medicalContainer}>
+                <div style={styles.reportContainer}>
                   {formatMedicalOutput(m.text).map((sec, idx) => (
-                    <div key={idx} style={styles.medicalCard}>
-                      <div style={styles.medicalTitle}>
+                    <div key={idx} style={styles.reportSection}>
+                      
+                      <div style={styles.reportHeader}>
                         {sec.title}
                       </div>
 
-                      <ul style={styles.medicalList}>
+                      <div style={styles.reportDivider}></div>
+
+                      <ul style={styles.reportList}>
                         {sec.points.map((p, i) => (
                           <li key={i}>{p}</li>
                         ))}
                       </ul>
+
                     </div>
                   ))}
                 </div>
@@ -1761,7 +1757,6 @@ const App = () => {
           <div ref={chatEndRef} />
         </div>
 
-        {/* INPUT */}
         <div style={{ ...styles.inputBar, background: theme.input }}>
           <button
             style={styles.plus}
@@ -1820,26 +1815,39 @@ const styles = {
   input: { flex: 1, borderRadius: 999, padding: "10px 14px" },
   send: { width: 40, height: 40, borderRadius: "50%", background: "#2563eb", color: "#fff" },
 
-  /* 🔥 NEW PREMIUM STYLES */
-  medicalContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-  },
-  medicalCard: {
-    padding: 14,
+  reportContainer: {
+    background: "#ffffff",
     borderRadius: 12,
-    background: "linear-gradient(135deg, #f8fafc, #eef2ff)",
-    border: "1px solid #e2e8f0",
+    padding: 20,
+    border: "1px solid #e5e7eb",
+    width: "100%",
   },
-  medicalTitle: {
-    fontWeight: 700,
+
+  reportSection: {
+    marginBottom: 20,
+    paddingLeft: 12,
+    borderLeft: "4px solid #1e3a8a",
+  },
+
+  reportHeader: {
+    fontWeight: 600,
+    fontSize: 16,
+    color: "#111827",
     marginBottom: 6,
-    color: "#1e3a8a",
   },
-  medicalList: {
+
+  reportDivider: {
+    height: 1,
+    background: "#e5e7eb",
+    marginBottom: 10,
+  },
+
+  reportList: {
     paddingLeft: 18,
-    lineHeight: 1.6,
+    margin: 0,
+    lineHeight: 1.7,
+    color: "#374151",
+    fontSize: 14,
   },
 };
 
