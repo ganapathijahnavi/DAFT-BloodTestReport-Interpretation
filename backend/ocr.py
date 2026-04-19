@@ -46,4 +46,3 @@ def extract_text_from_file(file_path: str) -> str:
             return f.read()
 
     raise ValueError("Unsupported file format")
-
