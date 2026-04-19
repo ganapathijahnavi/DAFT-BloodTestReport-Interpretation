@@ -34,7 +34,5 @@ pymongo
 certifi
 python-jose
 passlib[bcrypt]
-
-
-
-
+requests
+gradio
